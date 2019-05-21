@@ -10,8 +10,8 @@ public class Main {
     private static TransportDAO dao ;
 
     public static void main(String[] args) {
-	// write your code here
-        dao = TransportDAO.getInstance();
+        // write your code here
+        /*dao = TransportDAO.getInstance();
         Scanner tok = new Scanner(System.in);
         String result="";
         while (tok.hasNextLine()) {
@@ -106,5 +106,6 @@ public class Main {
         LocalDate birthday = LocalDate.parse(stream.nextLine(), DateTimeFormatter.ofPattern("d.M.yyyy"));
         LocalDate hireDate = LocalDate.parse(stream.nextLine(), DateTimeFormatter.ofPattern("d.M.yyyy"));
         dao.addDriver(new Driver(name, surname, umcn, birthday, hireDate));
+    }*/
     }
 }
