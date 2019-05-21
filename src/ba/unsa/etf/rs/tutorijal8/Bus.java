@@ -2,6 +2,7 @@ package ba.unsa.etf.rs.tutorijal8;
 
 public class Bus {
 
+
     public Bus(String man, String serija, int i) {
     }
 
