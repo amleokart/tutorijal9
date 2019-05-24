@@ -2,9 +2,8 @@ package ba.unsa.etf.rs.tutorijal8;
 
 import org.sqlite.JDBC;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
+import java.net.URL;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -62,15 +61,58 @@ public class TransportDAO {
         }
     }
 
-    private void InitializeStatments() {
+    static {
+        try {
+            DriverManager.registerDriver(new JDBC());
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
+    private void SetupDatabase() {
+        String sql="";
+        URL x = getClass().getResource("/SetupDatabase.sql");
+        FileReader fileReader = null;
+        try {
+            fileReader = new FileReader(x.getFile());
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            Scanner entrance = new Scanner(bufferedReader);
+            while(entrance.hasNextLine()){
+                sql+=entrance.nextLine();
+            }
+            try {
+                entrance.close();
+                bufferedReader.close();
+                fileReader.close();
+            } catch (IOException e) {
+
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        sql = sql.replace("\n"," ");
+        sql = sql.replace(";","\n");
+        String[] upiti = sql.split("\n");
+        try {
+            Statement statement = conn.createStatement();
+            for (String upit : upiti){
+                statement.execute(upit);
+            }
+        } catch (SQLException e) {
+
+        }
+    }
 
     public static TransportDAO getInstance() {
         if (instance == null)
             instance = new TransportDAO();
         return instance;
     }
+
+    private void InitializeStatments() {
+    }
+
 
     public void deleteBus(Bus bus) {
     }

@@ -29,12 +29,12 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/ba/unsa/etf/rs/tutorijal8/TransportDAO.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="380">
-              <caret line="56" column="56" selection-start-line="56" selection-start-column="56" selection-end-line="56" selection-end-column="56" />
+            <state relative-caret-position="730">
+              <caret line="110" column="5" selection-start-line="110" selection-start-column="5" selection-end-line="110" selection-end-column="5" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#2246#2247#0" expanded="true" />
-                <element signature="e#2314#2315#0" expanded="true" />
+                <element signature="e#3596#3597#0" expanded="true" />
+                <element signature="e#3664#3665#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -147,7 +147,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1558739650480" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1558740338998" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit5" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5" value="" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
@@ -284,7 +284,14 @@
       <option name="project" value="LOCAL" />
       <updated>1558527881184</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="dodane metode TestDatabase() i InitializeDatabase()">
+      <created>1558739866628</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1558739866628</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -355,7 +362,8 @@
     <MESSAGE value="završena klasa Bus" />
     <MESSAGE value="dodat upite, prepravit main, prepravit metode, provjerit bazu" />
     <MESSAGE value="dodat metode i upite" />
-    <option name="LAST_COMMIT_MESSAGE" value="dodat metode i upite" />
+    <MESSAGE value="dodane metode TestDatabase() i InitializeDatabase()" />
+    <option name="LAST_COMMIT_MESSAGE" value="dodane metode TestDatabase() i InitializeDatabase()" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/TransportDAO.java" />
@@ -413,12 +421,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ba/unsa/etf/rs/tutorijal8/TransportDAO.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="56" column="56" selection-start-line="56" selection-start-column="56" selection-end-line="56" selection-end-column="56" />
+        <state relative-caret-position="730">
+          <caret line="110" column="5" selection-start-line="110" selection-start-column="5" selection-end-line="110" selection-end-column="5" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#2246#2247#0" expanded="true" />
-            <element signature="e#2314#2315#0" expanded="true" />
+            <element signature="e#3596#3597#0" expanded="true" />
+            <element signature="e#3664#3665#0" expanded="true" />
           </folding>
         </state>
       </provider>
