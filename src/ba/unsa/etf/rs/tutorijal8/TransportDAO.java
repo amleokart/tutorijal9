@@ -4,78 +4,72 @@ import org.sqlite.JDBC;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class TransportDAO {
+
     private static TransportDAO instance;
     private Connection conn;
-    private Driver driver;
-    private PreparedStatement addBusU;
-    private PreparedStatement addDriver;
-    private PreparedStatement dodajVozacaBuseva;
-    private PreparedStatement obrisiBus;
-    private PreparedStatement obrisiVozaca;
-    private PreparedStatement obrisiVozacaBuseva;
-    private PreparedStatement getDriversU;
-    private PreparedStatement deleteBusU;
-    private PreparedStatement deleteDriverU;
-    private PreparedStatement idBus;
-    private PreparedStatement idDriver;
-    private PreparedStatement getBusU;
-    private PreparedStatement getDodjelaVozaci;
+    private static PreparedStatement addBus;
+    private static PreparedStatement getBus;
+    private static PreparedStatement deleteBus;
+    private static PreparedStatement addDriver;
+    private static PreparedStatement getDriver;
+    private static PreparedStatement deleteDriver;
+    private static PreparedStatement truncBusses;
+    private static PreparedStatement truncDrivers;
+
+    private TransportDAO() {
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite::baza.db");
+            TestDatabase();
+            InitializeStatments();
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private  void TestDatabase() {
+        try {
+            Statement s=conn.createStatement();
+            s.execute("SELECT * FROM Bus");
+            System.out.println("Database exists.");
+        } catch(SQLException e) {
+            InitializeDatabase();
+            e.printStackTrace();
+        }
+    }
+
+    private void InitializeDatabase() {
+        try {
+            Scanner entrance=new Scanner(new FileReader("baza.db")).useDelimiter(";");
+            while(entrance.hasNext()) {
+                String nextStatment=entrance.next();
+                while(!nextStatment.trim().isEmpty()) {
+                    Statement s=conn.createStatement();
+                    s.execute(nextStatment);
+                }
+            }
+            System.out.println("Database initialization complete.");
+        } catch (FileNotFoundException | SQLException e) {
+            System.out.println("Error initializing database!");
+            e.printStackTrace();
+        }
+    }
+
+    private void InitializeStatments() {
+    }
+
 
     public static TransportDAO getInstance() {
         if (instance == null)
             instance = new TransportDAO();
         return instance;
-    }
-
-    static {
-        try {
-            DriverManager.registerDriver(new JDBC());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private TransportDAO() {
-        try {
-            conn = DriverManager.getConnection("jdbc:sqlite:baza.db");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        try {
-            obrisiBus = conn.prepareStatement("DELETE FROM Bus");
-        } catch (SQLException e) {
-            TestDatabase();
-            e.printStackTrace();
-        }
-    }
-
-    public void TestDatabase() {
-        Scanner ulaz = null;
-        try {
-            ulaz = new Scanner(new FileInputStream("baza.db.sql"));
-            String sqlUpit = "";
-            while (ulaz.hasNext()) {
-                sqlUpit += ulaz.nextLine();
-                if (sqlUpit.charAt(sqlUpit.length() - 1) == ';') {
-                    try {
-                        Statement stmt = conn.createStatement();
-                        stmt.execute(sqlUpit);
-                        sqlUpit = "";
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        ulaz.close();
     }
 
     public void deleteBus(Bus bus) {
@@ -99,8 +93,5 @@ public class TransportDAO {
     }
 
     public void deleteDriver(Driver driver) {
-    }
-
-    public void dodijeliVozacuAutobus(Driver driver, Bus bus, int which) {
     }
 }
