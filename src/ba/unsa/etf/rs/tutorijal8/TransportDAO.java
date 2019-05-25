@@ -158,7 +158,7 @@ public class TransportDAO {
                 bus.setId(id);
             }
         } catch (SQLException e) {
-            System.out.println("Nije kreirana tabela Bus.");
+            System.out.println("Bus table not created.");
         }
         return bus;
     }
@@ -193,7 +193,7 @@ public class TransportDAO {
                     driver.setId(id);
                 }
             } catch (SQLException e) {
-                System.out.println("Nije kreirana tabela Driver.");
+                System.out.println("Driver table not created.");
                 e.printStackTrace();
             }
             return driver;
@@ -233,7 +233,7 @@ public class TransportDAO {
             addDriver.setDate(5, convertToDate(driver.getEmploymentDate()));
             addDriver.executeUpdate();
         } catch (SQLException e) {
-            throw new IllegalArgumentException("Vozač već postoji.");
+            throw new IllegalArgumentException("The driver already exists.");
         }
     }
 
