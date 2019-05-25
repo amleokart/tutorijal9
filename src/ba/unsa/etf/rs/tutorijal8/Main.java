@@ -10,8 +10,7 @@ public class Main {
     private static TransportDAO dao ;
 
     public static void main(String[] args) {
-        // write your code here
-        /*dao = TransportDAO.getInstance();
+        dao = TransportDAO.getInstance();
         Scanner tok = new Scanner(System.in);
         String result="";
         while (tok.hasNextLine()) {
@@ -35,7 +34,6 @@ public class Main {
                 case "Ispisi autobuse":
                     ispisiAutobuse();
                     break;
-
             }
         }
     }
@@ -63,7 +61,7 @@ public class Main {
         int busIndex = tok.nextInt()-1;
         Bus bus = dao.getBusses().get(busIndex);
         int which = 1;
-        if(bus.getDriverOne()!=null && bus.getDriverTwo()!=null){
+        if(bus.getDriverOne() != null && bus.getDriverTwo() != null){
             System.out.print("Umjesto kojeg vozača želite postaviti trenutnog(1 ili 2): ");
             which = tok.nextInt();
         }else if(bus.getDriverOne()!=null){
@@ -86,7 +84,7 @@ public class Main {
             System.out.println((i+1)+". "+dao.getDrivers().get(i));
         }
         int index = tok.nextInt()-1;
-        Driver driver = dao.getDrivers().get(index);
+        Driver driver = (Driver) dao.getDrivers().get(index);
         dao.deleteDriver(driver);
     }
 
@@ -106,6 +104,6 @@ public class Main {
         LocalDate birthday = LocalDate.parse(stream.nextLine(), DateTimeFormatter.ofPattern("d.M.yyyy"));
         LocalDate hireDate = LocalDate.parse(stream.nextLine(), DateTimeFormatter.ofPattern("d.M.yyyy"));
         dao.addDriver(new Driver(name, surname, umcn, birthday, hireDate));
-    }*/
+
     }
 }

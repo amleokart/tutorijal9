@@ -199,15 +199,58 @@ public class TransportDAO {
             return driver;
         }
 
+    public void addBus(Bus bus) {
+        try {
+            addBus.setString(1, bus.getMaker());
+            addBus.setString(2, bus.getSeries());
+            addBus.setInt(3, bus.getSeatNumber());
+            addBus.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Date convertToDate(LocalDate dateToConvert) {
+        return java.sql.Date.valueOf(dateToConvert);
+    }
+
     public void deleteBus(Bus bus) {
+        try {
+            System.out.println(bus.getId());
+            deleteBus.setInt(1, bus.getId());
+            deleteBus.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void addDriver(Driver driver) {
-    }
-    
-    public void addBus (Bus bus) {
+        try {
+            addDriver.setString(1, driver.getName());
+            addDriver.setString(2, driver.getSurname());
+            addDriver.setString(3, driver.getJMBG());
+            addDriver.setDate(4, convertToDate(driver.getBirthday()));
+            addDriver.setDate(5, convertToDate(driver.getEmploymentDate()));
+            addDriver.executeUpdate();
+        } catch (SQLException e) {
+            throw new IllegalArgumentException("Vozač već postoji.");
+        }
     }
 
     public void deleteDriver(Driver driver) {
+        try {
+            deleteDriver.setInt(1, driver.getId());
+            deleteDriver.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void dodijeliVozacuAutobus(Driver driver, Bus bus, int which) {
+        if (which == 1) {
+            bus.setDriverOne(driver);
+        } else {
+            bus.setDriverTwo(driver);
+        }
     }
 }
