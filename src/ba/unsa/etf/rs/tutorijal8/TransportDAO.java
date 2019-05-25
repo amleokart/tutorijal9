@@ -121,17 +121,52 @@ public class TransportDAO {
         truncDrivers=conn.prepareStatement("DELETE FROM Driver");
     }
 
-    public void deleteBus(Bus bus) {
-    }
-
     public void resetDatabase() {
-    }
-
-    public ArrayList<Driver> getDrivers() {
-        return null;
+        try {
+            truncBusses.executeUpdate();
+            truncDrivers.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public ArrayList<Bus> getBusses() {
+        ArrayList<Bus> busses = new ArrayList<Bus>();
+        try {
+            ResultSet resultSet = null;
+            resultSet = getBus.executeQuery();
+            Bus bus;
+            while((bus = getBusFromResultSet(resultSet)) != null){
+                busses.add(bus);
+            }
+            resultSet.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return busses;
+    }
+
+    private Bus getBusFromResultSet(ResultSet resultSet) {
+        Bus bus = null;
+        try {
+            if (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String maker = resultSet.getString(2);
+                String series = resultSet.getString(3);
+                int seatNumber = resultSet.getInt(4);
+                bus = new Bus(maker, series, seatNumber);
+                bus.setId(id);
+            }
+        } catch (SQLException e) {
+            System.out.println("Nije kreirana tabela bus!");
+        }
+        return bus;
+    }
+
+    public void deleteBus(Bus bus) {
+    }
+
+    public ArrayList<Driver> getDrivers() {
         return null;
     }
 
