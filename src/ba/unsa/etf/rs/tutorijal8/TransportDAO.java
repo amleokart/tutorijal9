@@ -110,9 +110,16 @@ public class TransportDAO {
         return instance;
     }
 
-    private void InitializeStatments() {
+    private void InitializeStatments() throws SQLException {
+        addBus=conn.prepareStatement("INSERT INTO Bus VALUES (null, ?, ?, ?)");
+        getBus=conn.prepareStatement("SELECT * FROM Bus");
+        deleteBus=conn.prepareStatement("DELETE FROM Bus WHERE id=?");
+        addDriver=conn.prepareStatement("INSERT INTO Driver VALUES (null, ?, ?, ?, ?, ?)");
+        getDriver=conn.prepareStatement("SELECT * FROM Driver");
+        deleteDriver=conn.prepareStatement("DELETE FROM Driver WHERE id=?");
+        truncBusses=conn.prepareStatement("DELETE FROM Bus");
+        truncDrivers=conn.prepareStatement("DELETE FROM Driver");
     }
-
 
     public void deleteBus(Bus bus) {
     }

@@ -37,8 +37,8 @@ public class Bus {
         this.maker = maker;
         this.series = series;
         this.seatNumber = seatNumber;
-        DriverOne = DriverOne;
-        DriverOne = DriverTwo;
+        this.DriverOne = DriverOne;
+        this.DriverOne = DriverTwo;
     }
 
     public int getId() {
