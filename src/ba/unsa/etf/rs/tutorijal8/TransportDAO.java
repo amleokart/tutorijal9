@@ -158,16 +158,48 @@ public class TransportDAO {
                 bus.setId(id);
             }
         } catch (SQLException e) {
-            System.out.println("Nije kreirana tabela bus!");
+            System.out.println("Nije kreirana tabela Bus.");
         }
         return bus;
     }
 
-    public void deleteBus(Bus bus) {
+    public ArrayList<Driver> getDrivers() {
+        ArrayList<Driver> drivers = new ArrayList<Driver>();
+        try {
+            ResultSet resultSet = null;
+            resultSet = getDriver.executeQuery();
+            Driver driver;
+            while((driver = getDriverFromResultSet(resultSet)) != null){
+                drivers.add(driver);
+            }
+            resultSet.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return drivers;
     }
 
-    public ArrayList<Driver> getDrivers() {
-        return null;
+    private Driver getDriverFromResultSet(ResultSet resultSet) {
+            Driver driver = null;
+            try {
+                if (resultSet.next()) {
+                    int id = resultSet.getInt("id");
+                    String name = resultSet.getString(2);
+                    String surname = resultSet.getString(3);
+                    String JMBG = resultSet.getString(4);
+                    LocalDate birthday = resultSet.getDate(5).toLocalDate();
+                    LocalDate employmentDate = resultSet.getDate(6).toLocalDate();
+                    driver = new Driver(name, surname, JMBG, birthday, employmentDate);
+                    driver.setId(id);
+                }
+            } catch (SQLException e) {
+                System.out.println("Nije kreirana tabela Driver.");
+                e.printStackTrace();
+            }
+            return driver;
+        }
+
+    public void deleteBus(Bus bus) {
     }
 
     public void addDriver(Driver driver) {
