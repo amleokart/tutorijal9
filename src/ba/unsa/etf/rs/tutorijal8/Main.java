@@ -4,24 +4,31 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.Region;
 import javafx.stage.Stage;
+
+import static javafx.scene.layout.Region.USE_COMPUTED_SIZE;
 
 public class Main extends Application {
 
-    @Override
-    public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        primaryStage.setTitle("Hello World");
-        primaryStage.setScene(new Scene(root, 300, 275));
+    public void start(Stage primaryStage) throws Exception {
+        TransportDAO model = new TransportDAO();
+        model.napuniDriver();
+        model.napuniBus();
+
+        Controller ctrl = new Controller(model);
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/transport.fxml"));
+        loader.setController(ctrl);
+        Parent root = loader.load();
+        primaryStage.setTitle("Transport");
+        primaryStage.setScene(new Scene(root, Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE));
         primaryStage.show();
-    }
-
-
-    public static void main(String[] args) {
-        launch(args);
+        primaryStage.setResizable(false);
+        primaryStage.toFront();
     }
 }
 
+//fx:controller="ba.unsa.etf.rs.tutorijal8.Controller"
 //fx:controller="ba.unsa.etf.rs.tutorijal8.Controller"
 
 /*import java.time.LocalDate;

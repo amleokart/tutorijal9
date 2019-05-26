@@ -1,22 +1,37 @@
 package ba.unsa.etf.rs.tutorijal8;
 
-public class Bus {
-    private Integer id;
-    private String maker;
-    private String series;
-    private Integer seatNumber;
-    private Integer driverNumber;
-    private Driver DriverOne = null;
-    private Driver DriverTwo = null;
+import javafx.beans.property.SimpleObjectProperty;
 
-    public Bus(){ }
+public class Bus {
+    private Integer ID = null;
+    private String maker = "NULL";
+    private String series = "NULL";
+    private int seatNumber = -1;
+    private SimpleObjectProperty<Driver> driverOne = new SimpleObjectProperty<>();
+    private SimpleObjectProperty<Driver> driverTwo = new SimpleObjectProperty<>();
+
+    private Driver getDriverOne() {
+        return driverOne.get();
+    }
+
+    public SimpleObjectProperty<Driver> driverOneProperty() {
+        return driverOne;
+    }
 
     public void setDriverOne(Driver driverOne) {
-        DriverOne=driverOne;
+        this.driverOne.set(driverOne);
+    }
+
+    private Driver getDriverTwo() {
+        return driverTwo.get();
+    }
+
+    public SimpleObjectProperty<Driver> driverTwoProperty() {
+        return driverTwo;
     }
 
     public void setDriverTwo(Driver driverTwo) {
-        DriverTwo=driverTwo;
+        this.driverTwo.set(driverTwo);
     }
 
     public Bus(String maker, String series, int seatNumber) {
@@ -25,28 +40,23 @@ public class Bus {
         this.seatNumber = seatNumber;
     }
 
-    public Bus(int id, String maker, String series, int seatNumber) {
-        id = id;
+    public Bus(Integer ID, String maker, String series, int seatNumber) {
+        this.ID = ID;
         this.maker = maker;
         this.series = series;
         this.seatNumber = seatNumber;
     }
 
-    public Bus(int id, String maker, String series, int seatNumber, Driver DriverOne, Driver DriverTwo) {
-        id = id;
+    public Bus(int ID, String maker, String series, int seatNumber, Driver driverOne, Driver driverTwo) {
+        this.ID = ID;
         this.maker = maker;
         this.series = series;
         this.seatNumber = seatNumber;
-        this.DriverOne = DriverOne;
-        this.DriverOne = DriverTwo;
+        setDriverOne(driverOne);
+        setDriverTwo(driverTwo);
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    public Bus() {
     }
 
     public String getMaker() {
@@ -73,32 +83,29 @@ public class Bus {
         this.seatNumber = seatNumber;
     }
 
-    public int getDriverNumber() {
-        return driverNumber;
+    public Integer getID() {
+        return ID;
     }
 
-    public void setDriverNumber(int driverNumber) {
-        this.driverNumber = driverNumber;
-    }
-
-    public Driver getDriverOne() {
-        return DriverOne;
-    }
-
-    public Driver getDriverTwo() {
-        return DriverTwo;
-    }
+    public void setID(Integer ID) { this.ID=ID; }
 
     @Override
     public String toString () {
-        String string = "";
-        string += this.maker + " " + this.series + " ( seats: " + this.getSeatNumber() + " )";
-        if (DriverOne != null) {
-            string += DriverOne.toString();
+        String name = "";
+        name += this.maker + " " + this.series + " ( seats: " + this.getSeatNumber() + " )";
+        if (driverOne != null) {
+            name += driverOne.toString();
         }
-        if (DriverTwo != null) {
-            string += DriverTwo.toString();
+        if (driverTwo != null) {
+            name += driverTwo.toString();
         }
-        return string;
+        return name;
+    }
+
+    public boolean equals(Bus bus) {
+        if (ID != null) {
+            return (bus.getID().equals(this.getID()));
+        }
+        return false;
     }
 }

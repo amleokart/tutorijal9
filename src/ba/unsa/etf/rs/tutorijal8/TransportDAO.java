@@ -1,5 +1,8 @@
 package ba.unsa.etf.rs.tutorijal8;
 
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.sqlite.JDBC;
 
 import java.io.*;
@@ -10,6 +13,9 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class TransportDAO {
+
+    public TransportDAO() {
+    }
 
     /*private static TransportDAO instance;
     private Connection conn;
@@ -155,7 +161,7 @@ public class TransportDAO {
                 String series = resultSet.getString(3);
                 int seatNumber = resultSet.getInt(4);
                 bus = new Bus(maker, series, seatNumber);
-                bus.setId(id);
+                bus.setID(id);
             }
         } catch (SQLException e) {
             System.out.println("Bus table not created.");
@@ -190,7 +196,7 @@ public class TransportDAO {
                     LocalDate birthday = resultSet.getDate(5).toLocalDate();
                     LocalDate employmentDate = resultSet.getDate(6).toLocalDate();
                     driver = new Driver(name, surname, JMBG, birthday, employmentDate);
-                    driver.setId(id);
+                    driver.setID(id);
                 }
             } catch (SQLException e) {
                 System.out.println("Driver table not created.");
@@ -216,8 +222,8 @@ public class TransportDAO {
 
     public void deleteBus(Bus bus) {
         try {
-            System.out.println(bus.getId());
-            deleteBus.setInt(1, bus.getId());
+            System.out.println(bus.getID());
+            deleteBus.setInt(1, bus.getID());
             deleteBus.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -229,7 +235,7 @@ public class TransportDAO {
             addDriver.setString(1, driver.getName());
             addDriver.setString(2, driver.getSurname());
             addDriver.setString(3, driver.getJMBG());
-            addDriver.setDate(4, convertToDate(driver.getBirthday()));
+            addDriver.setDate(4, convertToDate(driver.getBirthdayDate()));
             addDriver.setDate(5, convertToDate(driver.getEmploymentDate()));
             addDriver.executeUpdate();
         } catch (SQLException e) {
@@ -239,7 +245,7 @@ public class TransportDAO {
 
     public void deleteDriver(Driver driver) {
         try {
-            deleteDriver.setInt(1, driver.getId());
+            deleteDriver.setInt(1, driver.getID());
             deleteDriver.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -253,4 +259,55 @@ public class TransportDAO {
             bus.setDriverTwo(driver);
         }
     }*/
-}
+
+    private ObservableList<Driver> driver= FXCollections.observableArrayList();
+    private SimpleObjectProperty<Driver> currentPersonDriver = new SimpleObjectProperty<>();
+    public ObservableList<Driver> getDriver() {
+        return driver;
+    }
+    public void setDriver(ObservableList<Driver> osobe) {
+        this.driver=driver;
+    }
+    public Driver getCurrentPersonDriver() {
+        return currentPersonDriver.get();
+    }
+    public SimpleObjectProperty<Driver> currentPersonDriverProperty() {
+        return currentPersonDriver;
+    }
+    public void setCurrentPersonDriver(Driver currentPersonDriver) { this.currentPersonDriver.set(currentPersonDriver); }
+    public void addDriver() {
+        driver.add(new Driver());
+    }
+    public void deleteDriver() { driver.remove(currentPersonDriver); }
+
+    private ObservableList<Bus> bus= FXCollections.observableArrayList();
+    private SimpleObjectProperty<Bus> currentPersonBus=new SimpleObjectProperty<>();
+    public ObservableList<Bus> getBus() {
+        return bus;
+    }
+    public void setBus(ObservableList<Bus> bus) {
+        this.bus=bus;
+    }
+    public Bus getCurrentPersonBus() {
+        return currentPersonBus.get();
+    }
+    public SimpleObjectProperty<Bus> currentPersonBusProperty() {
+        return currentPersonBus;
+    }
+    public void setCurrentPersonBus(Bus currentPersonBus) {
+        this.currentPersonBus.set(currentPersonBus);
+    }
+    public void addBus() {
+        bus.add(new Bus());
+    }
+    public void deleteBus() { bus.remove(currentPersonBus); }
+
+    public void napuniDriver() {
+        currentPersonDriver.set(null);
+    }
+
+    public void napuniBus() {
+        currentPersonBus.set(null);
+    }
+
+    }

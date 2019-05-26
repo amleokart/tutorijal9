@@ -1,45 +1,42 @@
 package ba.unsa.etf.rs.tutorijal8;
 
+import javafx.beans.property.SimpleObjectProperty;
+
 import java.time.LocalDate;
 
 public class Driver {
-    private Integer id;
+    private Integer ID = -1;
     private String name;
     private String surname;
     private String JMBG;
-    private LocalDate birthday;
-    private LocalDate employmentDate;
+    private SimpleObjectProperty<LocalDate> birthdayDate = new SimpleObjectProperty<>();
+    private SimpleObjectProperty<LocalDate> employmentDate = new SimpleObjectProperty<>();
+
 
     public Driver() {
+        name = "NULL";
+        surname = "NULL";
+        JMBG = "NULL";
+        birthdayDate.set(LocalDate.of(1,1,1));
+        employmentDate.set(LocalDate.of(1,1,1));
     }
 
-    public Driver(Integer id, String name, String surname, String JMBG, LocalDate birthday, LocalDate employmentDate) {
-        this.id = id;
+    public Driver(String name, String surname, String JMBG, LocalDate birthdayDate, LocalDate employmentDate) {
         this.name = name;
         this.surname = surname;
         this.JMBG = JMBG;
-        this.birthday = birthday;
-        this.employmentDate = employmentDate;
+        setBirthdayDate(birthdayDate);
+        setEmploymentDate(employmentDate);
     }
 
-    public Driver(int id , String name, String surname, String JMBG, LocalDate birthday, LocalDate employmentDate) {
-        this.id = id;
+    public Driver(Integer ID, String name, String surname, String JMBG, LocalDate birthdayDate, LocalDate employmentDate) {
+        this.ID = ID;
         this.name = name;
         this.surname = surname;
         this.JMBG = JMBG;
-        this.birthday = birthday;
-        this.employmentDate = employmentDate;
-    }
+        setBirthdayDate(birthdayDate);
+        setEmploymentDate(employmentDate);
 
-    public Driver(String test, String testović, String s, LocalDate minusYears, LocalDate now) {
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -62,32 +59,44 @@ public class Driver {
         return JMBG;
     }
 
-    public void setJMBG(String JMBG) {
-        this.JMBG = JMBG;
+    public Integer getID() {
+        return ID;
     }
 
-    public LocalDate getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(LocalDate birthday) {
-        this.birthday = birthday;
-    }
-
-    public LocalDate getEmploymentDate() {
-        return employmentDate;
-    }
-
-    public void setEmploymentDate(LocalDate employmentDate) {
-        this.employmentDate = employmentDate;
+    public void setID(int ID) {
+        this.ID = ID;
     }
 
     @Override
     public String toString() {
-        return  " - (" + this.getName() + " " + this.getSurname() + " ( " + this.getJMBG() + " ))";
+        return this.getName() + " " + this.getSurname() + " ( " + this.getJMBG() + " )";
     }
 
     public boolean equals(Driver d) {
         return (d.getJMBG().equals(this.getJMBG()));
+    }
+
+    public LocalDate getBirthdayDate() {
+        return birthdayDate.get();
+    }
+
+    public SimpleObjectProperty<LocalDate> birthdayDateProperty() {
+        return birthdayDate;
+    }
+
+    private void setBirthdayDate(LocalDate birthdayDate) {
+        this.birthdayDate.set(birthdayDate);
+    }
+
+    public LocalDate getEmploymentDate() {
+        return employmentDate.get();
+    }
+
+    public SimpleObjectProperty<LocalDate> employmentDateProperty() {
+        return employmentDate;
+    }
+
+    private void setEmploymentDate(LocalDate employmentDate) {
+        this.employmentDate.set(employmentDate);
     }
 }
