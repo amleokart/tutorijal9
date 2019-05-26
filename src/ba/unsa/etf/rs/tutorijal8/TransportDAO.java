@@ -11,7 +11,7 @@ import java.util.Scanner;
 
 public class TransportDAO {
 
-    private static TransportDAO instance;
+    /*private static TransportDAO instance;
     private Connection conn;
     private static PreparedStatement addBus;
     private static PreparedStatement getBus;
@@ -252,5 +252,5 @@ public class TransportDAO {
         } else {
             bus.setDriverTwo(driver);
         }
-    }
+    }*/
 }
