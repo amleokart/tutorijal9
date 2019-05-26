@@ -22,7 +22,7 @@ public class Main extends Application {
     }
 }
 
-//fx:controller="ba.unsa.etf.rs.tutorijal8.TransportContoller"
+//fx:controller="ba.unsa.etf.rs.tutorijal8.Controller"
 
 /*import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

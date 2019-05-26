@@ -1,0 +1,7 @@
+#btnDodaj {
+    -fx-graphic: url("/img/list-add.png");
+}
+
+#btnObrisi {
+    -fx-graphic: url("/img/edit-delete.png");
+}
