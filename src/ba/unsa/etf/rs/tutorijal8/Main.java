@@ -11,11 +11,28 @@ import static javafx.scene.layout.Region.USE_COMPUTED_SIZE;
 
 public class Main extends Application {
 
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        TransportDAO model = new TransportDAO();
+        model.napuniDriver();
+        Controller ctrl = new Controller(model);
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/transport.fxml"));
+        loader.setController(ctrl);
+        Parent root = loader.load();
+        primaryStage.setTitle("Transport");
+        primaryStage.setScene(new Scene(root, Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE));
+        primaryStage.show();
+        primaryStage.setResizable(false);
+        //primaryStage.toFront();
+    }
+}
+
+/*public class Main extends Application {
+
     public void start(Stage primaryStage) throws Exception {
         TransportDAO model = new TransportDAO();
         model.napuniDriver();
         model.napuniBus();
-
         Controller ctrl = new Controller(model);
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/transport.fxml"));
         loader.setController(ctrl);
@@ -26,7 +43,7 @@ public class Main extends Application {
         primaryStage.setResizable(false);
         primaryStage.toFront();
     }
-}
+}*/
 
 //fx:controller="ba.unsa.etf.rs.tutorijal8.Controller"
 //fx:controller="ba.unsa.etf.rs.tutorijal8.Controller"
