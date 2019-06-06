@@ -301,13 +301,4 @@ public class TransportDAO {
         bus.add(new Bus());
     }
     public void deleteBus() { bus.remove(currentPersonBus); }
-
-    public void napuniDriver() {
-        currentPersonDriver.set(null);
-    }
-
-    public void napuniBus() {
-        currentPersonBus.set(null);
-    }
-
-    }
+}

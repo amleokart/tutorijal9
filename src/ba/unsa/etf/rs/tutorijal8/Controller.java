@@ -1,5 +1,7 @@
 package ba.unsa.etf.rs.tutorijal8;
 
+//fx:controller="ba.unsa.etf.rs.tutorijal8.Controller"
+
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
