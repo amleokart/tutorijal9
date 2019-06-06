@@ -14,10 +14,8 @@ import java.util.Scanner;
 
 public class TransportDAO {
 
-    public TransportDAO() {
-    }
 
-    /*private static TransportDAO instance;
+    private static TransportDAO instance;
     private Connection conn;
     private static PreparedStatement addBus;
     private static PreparedStatement getBus;
@@ -258,7 +256,7 @@ public class TransportDAO {
         } else {
             bus.setDriverTwo(driver);
         }
-    }*/
+    }
 
     private ObservableList<Driver> driver= FXCollections.observableArrayList();
     private SimpleObjectProperty<Driver> currentPersonDriver = new SimpleObjectProperty<>();
@@ -301,4 +299,18 @@ public class TransportDAO {
         bus.add(new Bus());
     }
     public void deleteBus() { bus.remove(currentPersonBus); }
+
+    public void napuniDriver() {
+        driver.add(new Driver(1234,"Semsic","Semsic", "jmbg123456", LocalDate.of(2018, 4, 5), LocalDate.of(1998,4,13)));
+        driver.add(new Driver(1235,"Ajla","Ajlic", "jmbg123457", LocalDate.of(2018, 4, 5), LocalDate.of(1998,4,13)));
+        driver.add(new Driver(1234,"Nada","Nadic", "jmbg123458", LocalDate.of(2018, 4, 5), LocalDate.of(1998,4,13)));
+        currentPersonDriver.set(null);
+    }
+
+    public void napuniBus() {
+        bus.add(new Bus("Semso", "Semsic", 1));
+        bus.add(new Bus("Nada", "Nadic", 2));
+        currentPersonBus.set(null);
+    }
+
 }
