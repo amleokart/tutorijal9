@@ -1,316 +1,408 @@
 package ba.unsa.etf.rs.tutorijal8;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import org.sqlite.JDBC;
 
-import java.io.*;
-import java.net.URL;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class TransportDAO {
 
-
-    private static TransportDAO instance;
+    private static TransportDAO instance = null;
     private Connection conn;
-    private static PreparedStatement addBus;
-    private static PreparedStatement getBus;
-    private static PreparedStatement deleteBus;
-    private static PreparedStatement addDriver;
-    private static PreparedStatement getDriver;
-    private static PreparedStatement deleteDriver;
-    private static PreparedStatement truncBusses;
-    private static PreparedStatement truncDrivers;
+    private ObservableList<Bus> BUSlist = FXCollections.observableArrayList();
+    private ObjectProperty<Bus> currentBus = null;
+    private ObservableList<Driver> DRIVERlist = FXCollections.observableArrayList();
+    private ObjectProperty<Driver> currentDriver = null;
+    private PreparedStatement addDriverST;
+    private PreparedStatement getDriverST;
+    private PreparedStatement deleteDriverST;
+    private PreparedStatement updateDriverST;
+    private PreparedStatement addBusST;
+    private PreparedStatement getBusST;
+    private PreparedStatement deleteBusST;
+    private PreparedStatement updateBusST;
+    private PreparedStatement truncDriver;
+    private PreparedStatement truncBus;
+    private PreparedStatement DriverID;
+    private PreparedStatement BusID;
+    private PreparedStatement addDriverBusST;
+    private PreparedStatement getAssignmentDriver;
+    private PreparedStatement deleteAssignmentBus;
+    private PreparedStatement deleteAssignmentDriver;
+    private PreparedStatement truncAssignment; //dodjela
+    private PreparedStatement resetAutoIncrementAssignment;
+    private PreparedStatement resetAutoIncrementDrivers;
+    private PreparedStatement resetAutoIncrementBuses;
+    private PreparedStatement deleteAssignmentDriverBus;
 
-    private TransportDAO() {
-        try {
-            Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection("jdbc:sqlite::baza.db");
-            TestDatabase();
-            InitializeStatments();
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+    public static TransportDAO getInstance () {
+        if (instance == null) {
+            initialize();
         }
-    }
-
-    private  void TestDatabase() {
-        try {
-            Statement s=conn.createStatement();
-            s.execute("SELECT * FROM Bus");
-            System.out.println("Database exists.");
-        } catch(SQLException e) {
-            InitializeDatabase();
-            e.printStackTrace();
-        }
-    }
-
-    private void InitializeDatabase() {
-        try {
-            Scanner entrance=new Scanner(new FileReader("baza.db")).useDelimiter(";");
-            while(entrance.hasNext()) {
-                String nextStatment=entrance.next();
-                while(!nextStatment.trim().isEmpty()) {
-                    Statement s=conn.createStatement();
-                    s.execute(nextStatment);
-                }
-            }
-            System.out.println("Database initialization complete.");
-        } catch (FileNotFoundException | SQLException e) {
-            System.out.println("Error initializing database!");
-            e.printStackTrace();
-        }
-    }
-
-    static {
-        try {
-            DriverManager.registerDriver(new JDBC());
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void SetupDatabase() {
-        String sql="";
-        URL x = getClass().getResource("/SetupDatabase.sql");
-        FileReader fileReader = null;
-        try {
-            fileReader = new FileReader(x.getFile());
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            Scanner entrance = new Scanner(bufferedReader);
-            while(entrance.hasNextLine()){
-                sql+=entrance.nextLine();
-            }
-            try {
-                entrance.close();
-                bufferedReader.close();
-                fileReader.close();
-            } catch (IOException e) {
-
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        sql = sql.replace("\n"," ");
-        sql = sql.replace(";","\n");
-        String[] upiti = sql.split("\n");
-        try {
-            Statement statement = conn.createStatement();
-            for (String upit : upiti){
-                statement.execute(upit);
-            }
-        } catch (SQLException e) {
-
-        }
-    }
-
-    public static TransportDAO getInstance() {
-        if (instance == null)
-            instance = new TransportDAO();
         return instance;
     }
 
-    private void InitializeStatments() throws SQLException {
-        addBus=conn.prepareStatement("INSERT INTO Bus VALUES (null, ?, ?, ?)");
-        getBus=conn.prepareStatement("SELECT * FROM Bus");
-        deleteBus=conn.prepareStatement("DELETE FROM Bus WHERE id=?");
-        addDriver=conn.prepareStatement("INSERT INTO Driver VALUES (null, ?, ?, ?, ?, ?)");
-        getDriver=conn.prepareStatement("SELECT * FROM Driver");
-        deleteDriver=conn.prepareStatement("DELETE FROM Driver WHERE id=?");
-        truncBusses=conn.prepareStatement("DELETE FROM Bus");
-        truncDrivers=conn.prepareStatement("DELETE FROM Driver");
+    public TransportDAO() {
+        prepareStatements();
+        ucitajVozace();
+        ucitajBuseve();
     }
 
-    public void resetDatabase() {
+    private static void initialize() {
+        instance = new TransportDAO();
+    }
+
+    private void prepareStatements() {
         try {
-            truncBusses.executeUpdate();
-            truncDrivers.executeUpdate();
+            conn = DriverManager.getConnection("jdbc:sqlite:proba.db");
+            Class.forName("org.sqlite.JDBC");
+            DriverID = conn.prepareStatement("SELECT max(id) + 1 FROM drivers");
+            BusID = conn.prepareStatement("SELECT max(id) + 1 FROM buses");
+            addDriverST = conn.prepareStatement("INSERT INTO drivers(id, name, surname, jmb, birth, hire_date)" +
+                    " VALUES(?,?,?,?,?,?)");
+            addBusST = conn.prepareStatement("INSERT INTO buses(id, proizvodjac, serija, broj_sjedista)" +
+                    " VALUES(?, ?, ?, ?)");
+            getBusST = conn.prepareStatement("SELECT id, proizvodjac, serija, broj_sjedista" +
+                    " FROM buses");
+            getAssignmentDriver = conn.prepareStatement("SELECT DISTINCT dr.id, dr.name, dr.surname, dr.jmb, dr.birth, dr.hire_date" +
+                    " FROM dodjela d INNER JOIN drivers dr ON (d.driver_id = dr.id) WHERE d.bus_id=?");
+            getDriverST = conn.prepareStatement("SELECT id, name, surname, jmb, birth, hire_date" +
+                    " FROM drivers");
+            deleteAssignmentBus = conn.prepareStatement("DELETE FROM dodjela WHERE bus_id = ?; COMMIT;");
+            deleteAssignmentDriver = conn.prepareStatement("DELETE FROM dodjela WHERE driver_id = ?; COMMIT;");
+            deleteDriverST = conn.prepareStatement("DELETE FROM Drivers WHERE id = ?; COMMIT;");
+            deleteBusST = conn.prepareStatement("DELETE FROM buses WHERE id = ?; COMMIT;");
+            truncBus = conn.prepareStatement("DELETE FROM buses WHERE 1=1; COMMIT;");
+            truncDriver = conn.prepareStatement("DELETE FROM drivers WHERE 1=1; COMMIT;");
+            truncAssignment = conn.prepareStatement("DELETE FROM dodjela WHERE 1=1; COMMIT;");
+            resetAutoIncrementAssignment = conn.prepareStatement("DELETE FROM SQLITE_SEQUENCE WHERE name='dodjela'; COMMIT;");
+            resetAutoIncrementBuses = conn.prepareStatement("DELETE FROM SQLITE_SEQUENCE WHERE name='buses'; COMMIT;");
+            resetAutoIncrementDrivers = conn.prepareStatement("DELETE FROM SQLITE_SEQUENCE WHERE name='drivers'; COMMIT;");
+            addDriverBusST = conn.prepareStatement("INSERT OR REPLACE INTO dodjela(bus_id, driver_id)" +
+                    " VALUES (?,?); COMMIT; ");
+            updateDriverST = conn.prepareStatement("UPDATE drivers SET name = ?, surname = ?, jmb = ?, " +
+                    "birth = ?, hire_date = ? WHERE id = ?; COMMIT; ");
+            updateBusST = conn.prepareStatement("UPDATE buses SET proizvodjac = ?, serija = ?," +
+                    " broj_sjedista = ? WHERE id = ?; COMMIT;");
+            deleteAssignmentDriverBus = conn.prepareStatement("DELETE FROM dodjela WHERE bus_id = ? AND driver_id = ?; COMMIT;");
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            System.out.println("Nije pronadjen driver za konekciju na bazu");
+            e.printStackTrace();
         }
+    }
+
+    public void ucitajBuseve() {
+        BUSlist =  FXCollections.observableArrayList(getBusses());
+        if (BUSlist.size() > 0) {
+            currentBus = new SimpleObjectProperty<>(BUSlist.get(0)) ;
+        } else {
+            currentBus = new SimpleObjectProperty<>(new Bus());
+        }
+    }
+
+    public void ucitajVozace() {
+        DRIVERlist = FXCollections.observableArrayList(getDrivers());
+        if (DRIVERlist.size() > 0) {
+            currentDriver = new SimpleObjectProperty<>(getDRIVERlist().get(0));
+        } else {
+            currentDriver = new SimpleObjectProperty<>(new Driver());
+        }
+    }
+
+    public static void removeInsance() {
+        if (instance != null) {
+            try {
+                instance.conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        instance = null;
     }
 
     public ArrayList<Bus> getBusses() {
-        ArrayList<Bus> busses = new ArrayList<Bus>();
+        ArrayList<Bus> buses = new ArrayList<>();
         try {
-            ResultSet resultSet = null;
-            resultSet = getBus.executeQuery();
-            Bus bus;
-            while((bus = getBusFromResultSet(resultSet)) != null){
-                busses.add(bus);
+            ResultSet result = getBusST.executeQuery();
+            while(result.next()) {
+                Integer id = result.getInt(1);
+                String maker = result.getString(2);
+                String series = result.getString(3);
+                int seatNumber = result.getInt(4);
+                getAssignmentDriver.setInt(1, id);
+                ResultSet result2 = getAssignmentDriver.executeQuery();
+                ArrayList<Driver> drivers = new ArrayList<Driver>();
+                while (result2.next()) {
+                    Integer idDriver = result2.getInt(1);
+                    String name = result2.getString(2);
+                    String surname = result2.getString(3);
+                    String jmb = result2.getString(4);
+                    Date birthDate = result2.getDate(5);
+                    Date hireDate = result2.getDate(5);
+                    drivers.add(new Driver(idDriver, name, surname, jmb, birthDate.toLocalDate(), hireDate.toLocalDate()));
+                }
+                if (drivers.size() == 0) {
+                    buses.add(new Bus(id, maker, series, seatNumber, null, null));
+                } else if (drivers.size() == 1) {
+                    buses.add(new Bus(id, maker, series, seatNumber, drivers.get(0), null));
+                } else {
+                    buses.add(new Bus(id, maker, series, seatNumber, drivers.get(0), drivers.get(1)));
+                }
             }
-            resultSet.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return busses;
-    }
+        return buses;
 
-    private Bus getBusFromResultSet(ResultSet resultSet) {
-        Bus bus = null;
-        try {
-            if (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String maker = resultSet.getString(2);
-                String series = resultSet.getString(3);
-                int seatNumber = resultSet.getInt(4);
-                bus = new Bus(maker, series, seatNumber);
-                bus.setID(id);
-            }
-        } catch (SQLException e) {
-            System.out.println("Bus table not created.");
-        }
-        return bus;
     }
 
     public ArrayList<Driver> getDrivers() {
-        ArrayList<Driver> drivers = new ArrayList<Driver>();
+        ArrayList<Driver> drivers = new ArrayList<>();
         try {
-            ResultSet resultSet = null;
-            resultSet = getDriver.executeQuery();
-            Driver driver;
-            while((driver = getDriverFromResultSet(resultSet)) != null){
-                drivers.add(driver);
+            ResultSet result = getDriverST.executeQuery();
+            while (result.next()) {
+                Integer idDriver = result.getInt(1);
+                String name = result.getString(2);
+                String surname = result.getString(3);
+                String jmb = result.getString(4);
+                Date birthDate = result.getDate(5);
+                Date hireDate = result.getDate(6);
+                drivers.add(new Driver(idDriver, name, surname, jmb, birthDate.toLocalDate(), hireDate.toLocalDate()));
             }
-            resultSet.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return drivers;
     }
 
-    private Driver getDriverFromResultSet(ResultSet resultSet) {
-            Driver driver = null;
-            try {
-                if (resultSet.next()) {
-                    int id = resultSet.getInt("id");
-                    String name = resultSet.getString(2);
-                    String surname = resultSet.getString(3);
-                    String JMBG = resultSet.getString(4);
-                    LocalDate birthday = resultSet.getDate(5).toLocalDate();
-                    LocalDate employmentDate = resultSet.getDate(6).toLocalDate();
-                    driver = new Driver(name, surname, JMBG, birthday, employmentDate);
-                    driver.setID(id);
-                }
-            } catch (SQLException e) {
-                System.out.println("Driver table not created.");
-                e.printStackTrace();
+
+    public void addNewDriver(String name, String surname, int jmb, LocalDate dateOfBirth, LocalDate hireDate) {
+        try {
+            ResultSet result = DriverID.executeQuery();
+            result.next();
+            Integer id = result.getInt(1);
+            if (id == null) {
+                id = 1;
             }
-            return driver;
+            addDriverST.setInt(1, id);
+            addDriverST.setString(2, name);
+            addDriverST.setString(3, surname);
+            addDriverST.setInt(4, jmb);
+            addDriverST.setDate(5, Date.valueOf(dateOfBirth));
+            addDriverST.setDate(6, Date.valueOf(hireDate));
+            addDriverST.executeUpdate();
+        } catch (SQLException e) {
+            throw new IllegalArgumentException();
         }
+    }
+
 
     public void addBus(Bus bus) {
         try {
-            addBus.setString(1, bus.getMaker());
-            addBus.setString(2, bus.getSeries());
-            addBus.setInt(3, bus.getSeatNumber());
-            addBus.executeUpdate();
+            ResultSet result = BusID.executeQuery();
+            result.next();
+            Integer id = result.getInt(1);
+            if (id == null) {
+                id = 1;
+            }
+            addBusST.setInt(1, id);
+            addBusST.setString(2, bus.getMaker());
+            addBusST.setString(3, bus.getSeries());
+            addBusST.setInt(4, bus.getSeatNumber());
+            addBusST.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public Date convertToDate(LocalDate dateToConvert) {
-        return java.sql.Date.valueOf(dateToConvert);
-    }
-
-    public void deleteBus(Bus bus) {
-        try {
-            System.out.println(bus.getID());
-            deleteBus.setInt(1, bus.getID());
-            deleteBus.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
     public void addDriver(Driver driver) {
         try {
-            addDriver.setString(1, driver.getName());
-            addDriver.setString(2, driver.getSurname());
-            addDriver.setString(3, driver.getJMBG());
-            addDriver.setDate(4, convertToDate(driver.getBirthdayDate()));
-            addDriver.setDate(5, convertToDate(driver.getEmploymentDate()));
-            addDriver.executeUpdate();
+            ResultSet result = DriverID.executeQuery();
+            result.next();
+            Integer id = result.getInt(1);
+            System.out.println(id);
+            if (id == null) {
+                id = 0;
+            }
+
+            addDriverST.setInt(1, id);
+            addDriverST.setString(2, driver.getName());
+            addDriverST.setString(3, driver.getSurname());
+            if(driver.getJMBG().equals("NULL") || driver.getJMBG().equals("")) {
+                addDriverST.setString(4, "NULLid " + id);
+            } else {
+                addDriverST.setString(4, driver.getJMBG());
+            }
+            addDriverST.setDate(5, Date.valueOf(driver.getBirthdayDate()));
+            addDriverST.setDate(6, Date.valueOf(driver.getEmploymentDate()));
+            addDriverST.executeUpdate();
         } catch (SQLException e) {
-            throw new IllegalArgumentException("The driver already exists.");
+            throw new IllegalArgumentException("Taj vozač već postoji!");
         }
     }
 
     public void deleteDriver(Driver driver) {
         try {
-            deleteDriver.setInt(1, driver.getID());
-            deleteDriver.executeUpdate();
+            deleteAssignmentDriver.setInt(1, driver.getId());
+            deleteAssignmentDriver.executeUpdate();
+            deleteDriverST.setInt(1, driver.getId());
+            deleteDriverST.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public void dodijeliVozacuAutobus(Driver driver, Bus bus, int which) {
-        if (which == 1) {
-            bus.setDriverOne(driver);
-        } else {
-            bus.setDriverTwo(driver);
+    public void deleteCurrentDriver() {
+        try {
+            if (currentDriver != null) {
+                deleteAssignmentDriver.setInt(1, currentDriver.get().getId());
+                deleteAssignmentDriver.executeUpdate();
+                deleteDriverST.setInt(1, currentDriver.get().getId());
+                deleteDriverST.executeUpdate();
+                ucitajBuseve();
+                ucitajVozace();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
-    private ObservableList<Driver> driver= FXCollections.observableArrayList();
-    private SimpleObjectProperty<Driver> currentPersonDriver = new SimpleObjectProperty<>();
-    public ObservableList<Driver> getDriver() {
-        return driver;
-    }
-    public void setDriver(ObservableList<Driver> osobe) {
-        this.driver=driver;
-    }
-    public Driver getCurrentPersonDriver() {
-        return currentPersonDriver.get();
-    }
-    public SimpleObjectProperty<Driver> currentPersonDriverProperty() {
-        return currentPersonDriver;
-    }
-    public void setCurrentPersonDriver(Driver currentPersonDriver) { this.currentPersonDriver.set(currentPersonDriver); }
-    public void addDriver() {
-        driver.add(new Driver());
-    }
-    public void deleteDriver() { driver.remove(currentPersonDriver); }
 
-    private ObservableList<Bus> bus= FXCollections.observableArrayList();
-    private SimpleObjectProperty<Bus> currentPersonBus=new SimpleObjectProperty<>();
-    public ObservableList<Bus> getBus() {
-        return bus;
-    }
-    public void setBus(ObservableList<Bus> bus) {
-        this.bus=bus;
-    }
-    public Bus getCurrentPersonBus() {
-        return currentPersonBus.get();
-    }
-    public SimpleObjectProperty<Bus> currentPersonBusProperty() {
-        return currentPersonBus;
-    }
-    public void setCurrentPersonBus(Bus currentPersonBus) {
-        this.currentPersonBus.set(currentPersonBus);
-    }
-    public void addBus() {
-        bus.add(new Bus());
-    }
-    public void deleteBus() { bus.remove(currentPersonBus); }
-
-    public void napuniDriver() {
-        driver.add(new Driver(1234,"Semsic","Semsic", "jmbg123456", LocalDate.of(2018, 4, 5), LocalDate.of(1998,4,13)));
-        driver.add(new Driver(1235,"Ajla","Ajlic", "jmbg123457", LocalDate.of(2018, 4, 5), LocalDate.of(1998,4,13)));
-        driver.add(new Driver(1234,"Nada","Nadic", "jmbg123458", LocalDate.of(2018, 4, 5), LocalDate.of(1998,4,13)));
-        currentPersonDriver.set(null);
+    public void updateDriver (Driver driver) {
+        try {
+            updateDriverST.setString(1, driver.getName());
+            updateDriverST.setString(2, driver.getSurname());
+            updateDriverST.setString(3, driver.getJMBG());
+            updateDriverST.setDate(4, Date.valueOf(driver.getBirthdayDate()));
+            System.out.println(Date.valueOf(driver.getBirthdayDate()) + " " + Date.valueOf(driver.getEmploymentDate()));
+            updateDriverST.setDate(5, Date.valueOf(driver.getEmploymentDate()));
+            updateDriverST.setInt(6, driver.getId());
+            updateDriverST.executeUpdate();
+            currentDriver.set(driver);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void napuniBus() {
-        bus.add(new Bus("Semso", "Semsic", 1));
-        bus.add(new Bus("Nada", "Nadic", 2));
-        currentPersonBus.set(null);
+    public void updateBus (Bus bus) {
+        try {
+            updateBusST.setString(1, bus.getMaker());
+            updateBusST.setString(2, bus.getSeries());
+            updateBusST.setInt(3, bus.getSeatNumber());
+            updateBusST.setInt(4, bus.getId());
+            updateBusST.executeUpdate();
+            this.currentBus.set(bus);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
+
+
+    public void deleteBus(Bus bus) {
+        try {
+            deleteAssignmentBus.setInt(1, bus.getId());
+            deleteAssignmentBus.executeUpdate();
+            deleteBusST.setInt(1, bus.getId());
+            deleteBusST.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void deleteDodjela(Driver driver, Bus bus) {
+        try {
+            System.out.println("Bisanje busID:" + bus.getId());
+            System.out.println("Bisanje driverID:" + driver.getId());
+            deleteAssignmentDriverBus.setInt(1, bus.getId());
+            deleteAssignmentDriverBus.setInt(2, driver.getId());
+            deleteAssignmentDriverBus.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            System.out.println("Nije nista obrisano jer nema takve dodjele");
+        }
+    }
+
+
+    public void dodijeliVozacuAutobus(Driver driver, Bus bus, int which) {
+        try {
+            System.out.println("Dodjela busID:" + bus.getId());
+            System.out.println("Dodjela driverID:" + driver.getId());
+            addDriverBusST.setInt(1, bus.getId());
+            addDriverBusST.setInt(2, driver.getId());
+            addDriverBusST.executeUpdate();
+            if (which == 1) {
+                bus.setDriverOne(driver);
+            } else {
+                bus.setDriverTwo(driver);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            System.out.println("Nije nista dodjeljeno");
+        }
+    }
+
+    public void resetDatabase() {
+        try {
+            truncAssignment.executeUpdate();
+            truncDriver.executeUpdate();
+            truncBus.executeUpdate();
+            resetAutoIncrementAssignment.executeUpdate();
+            resetAutoIncrementDrivers.executeUpdate();
+            resetAutoIncrementBuses.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ObservableList<Bus> getBUSlist() {
+        return BUSlist;
+    }
+
+    public void setBUSlist(ObservableList<Bus> BUSlist) {
+        this.BUSlist = BUSlist;
+    }
+
+    public Bus getCurrentBus() {
+        return currentBus.get();
+    }
+
+    public ObjectProperty<Bus> currentBusProperty() {
+        return currentBus;
+    }
+
+    public void setCurrentBus(Bus currentBus) {
+        this.currentBus.set(currentBus);
+    }
+
+    public ObservableList<Driver> getDRIVERlist() {
+        return DRIVERlist;
+    }
+
+    public void setDRIVERlist(ObservableList<Driver> DRIVERlist) {
+        this.DRIVERlist = DRIVERlist;
+    }
+
+    public Driver getCurrentDriver() {
+        return currentDriver.get();
+    }
+
+    public ObjectProperty<Driver> currentDriverProperty() {
+        return currentDriver;
+    }
+
+    public void setCurrentDriver(Driver currentDriver) {
+        this.currentDriver.set(currentDriver);
+    }
 }
+

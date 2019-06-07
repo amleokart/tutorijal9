@@ -32,7 +32,7 @@ class Zadatak1Test {
         assertAll(()->{
             assertEquals(1,drivers.size());
             assertEquals("Test",drivers.get(0).getName());
-            assertEquals(LocalDate.of(1997,2,11),drivers.get(0).getBirthday());
+            assertEquals(LocalDate.of(1997,2,11),drivers.get(0).getBirthdayDate());
         });
     }
 

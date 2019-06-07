@@ -5,7 +5,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import java.time.LocalDate;
 
 public class Driver {
-    private Integer ID = -1;
+    
+    private Integer id = -1;
     private String name;
     private String surname;
     private String JMBG;
@@ -17,8 +18,9 @@ public class Driver {
         name = "NULL";
         surname = "NULL";
         JMBG = "NULL";
-        birthdayDate.set(LocalDate.of(1,1,1));
-        employmentDate.set(LocalDate.of(1,1,1));
+        birthdayDate.set(LocalDate.of(1, 1, 1));
+        employmentDate.set(LocalDate.of(1, 1, 1));
+
     }
 
     public Driver(String name, String surname, String JMBG, LocalDate birthdayDate, LocalDate employmentDate) {
@@ -29,8 +31,8 @@ public class Driver {
         setEmploymentDate(employmentDate);
     }
 
-    public Driver(Integer ID, String name, String surname, String JMBG, LocalDate birthdayDate, LocalDate employmentDate) {
-        this.ID = ID;
+    public Driver(Integer idDriver, String name, String surname, String JMBG, LocalDate birthdayDate, LocalDate employmentDate) {
+        this.id = idDriver;
         this.name = name;
         this.surname = surname;
         this.JMBG = JMBG;
@@ -59,12 +61,13 @@ public class Driver {
         return JMBG;
     }
 
-    public Integer getID() {
-        return ID;
+
+    public Integer getId() {
+        return id;
     }
 
-    public void setID(int ID) {
-        this.ID = ID;
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override

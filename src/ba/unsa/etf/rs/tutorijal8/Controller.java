@@ -7,6 +7,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -18,86 +19,89 @@ import java.time.format.DateTimeFormatter;
 
 public class Controller {
 
-    public Button addbusButton;
-    public Button deletebusButton;
-    public Button exitbusButton;
-    public TableColumn columnMaker;
-    public TableColumn columnSeries;
-    public TableColumn columnSeatNumber;
-    public Button adddriverButton;
-    public Button deletedriverButton;
-    public Button exitdriverButton;
+    public TableView driverTable;
+    public TableView busTable;
+    //driver
     public TableColumn columnName;
     public TableColumn columnSurname;
     public TableColumn columnPersonalIDNumber;
     public TableColumn columnEmploymentDate;
+
     public TextField nameDriver;
     public TextField surnameDriver;
     public TextField JMBGDriver;
     public DatePicker BirthdayDateDriver;
     public DatePicker EmploymentDateDriver;
+    //bus
+    public TableColumn columnMaker;
+    public TableColumn columnSeries;
+    public TableColumn columnSeatNumber;
+
     public TextField MakerBus;
     public TextField SeriesBus;
     public TextField SeatNumberBus;
-    public TableView driverTable;
-    public TableView busTable;
+
+    public Button addbusButton;
+    public Button deletebusButton;
+    public Button exitbusButton;
+
+    public Button adddriverButton;
+    public Button deletedriverButton;
+    public Button exitdriverButton;
+
+    public Controller(TransportDAO t) {
+        transportModel = t;
+    }
     private TransportDAO transportModel;
 
-    public Controller(TransportDAO m) {
-        transportModel = m;
-    }
-
-    private void povezivanje() {
-        nameDriver.textProperty().bindBidirectional(new SimpleStringProperty(transportModel.getCurrentPersonDriver().getName()));
-        surnameDriver.textProperty().bindBidirectional(new SimpleStringProperty(transportModel.getCurrentPersonDriver().getSurname()));
-        JMBGDriver.textProperty().bindBidirectional(new SimpleStringProperty(transportModel.getCurrentPersonDriver().getJMBG()));
-        BirthdayDateDriver.valueProperty().bindBidirectional(transportModel.getCurrentPersonDriver().birthdayDateProperty());
-        EmploymentDateDriver.valueProperty().bindBidirectional(transportModel.getCurrentPersonDriver().employmentDateProperty());
-        MakerBus.textProperty().bindBidirectional(new SimpleStringProperty(transportModel.getCurrentPersonBus().getMaker()));
-        SeriesBus.textProperty().bindBidirectional(new SimpleStringProperty(transportModel.getCurrentPersonBus().getSeries()));
-        SeatNumberBus.textProperty().bindBidirectional(new SimpleIntegerProperty(transportModel.getCurrentPersonBus().getSeatNumber()), new NumberStringConverter());
-    }
-
-    private void odvezivanje() {
-        nameDriver.textProperty().unbindBidirectional(transportModel.getCurrentPersonDriver().getName());
-        surnameDriver.textProperty().unbindBidirectional(transportModel.getCurrentPersonDriver().getSurname());
-        JMBGDriver.textProperty().unbindBidirectional(transportModel.getCurrentPersonDriver().getJMBG());
-        BirthdayDateDriver.valueProperty().unbindBidirectional(transportModel.getCurrentPersonDriver().birthdayDateProperty());
-        EmploymentDateDriver.valueProperty().unbindBidirectional(transportModel.getCurrentPersonDriver().employmentDateProperty());
-        MakerBus.textProperty().unbindBidirectional(transportModel.getCurrentPersonBus().getMaker());
-        SeriesBus.textProperty().unbindBidirectional(transportModel.getCurrentPersonBus().getSeries());
-        SeatNumberBus.textProperty().unbindBidirectional(transportModel.getCurrentPersonBus().getSeatNumber());
-    }
-
+    @FXML
     public void initialize() {
         columnName.setCellValueFactory(new PropertyValueFactory<Driver, String>("Name"));
         columnSurname.setCellValueFactory(new PropertyValueFactory<Driver, String>("Surname"));
-        columnPersonalIDNumber.setCellValueFactory(new PropertyValueFactory<Driver, String>("jmb"));
-        columnEmploymentDate.setCellValueFactory(new PropertyValueFactory<Driver, LocalDate>("birthday"));
-        columnMaker.setCellValueFactory(new PropertyValueFactory<Driver, LocalDate>("hireDate"));
-        columnSeries.setCellValueFactory(new PropertyValueFactory<Bus, String>("maker"));
-        columnSeatNumber.setCellValueFactory(new PropertyValueFactory<Bus, String>("series"));
-        povezivanje();
-        driverTable.setItems(transportModel.getDriver());
-        busTable.setItems(transportModel.getBus());
+        columnPersonalIDNumber.setCellValueFactory(new PropertyValueFactory<Driver, String>("Personal ID number"));
+        columnEmploymentDate.setCellValueFactory(new PropertyValueFactory<Driver, LocalDate>("Employment date"));
+
+        columnMaker.setCellValueFactory(new PropertyValueFactory<Bus, String>("Maker"));
+        columnSeries.setCellValueFactory(new PropertyValueFactory<Bus, String>("Series"));
+        columnSeatNumber.setCellValueFactory(new PropertyValueFactory<Bus, Integer>("Seat number"));
+        setTextPropetryBind();
+        driverTable.setItems(transportModel.getDRIVERlist());
+        busTable.setItems(transportModel.getBUSlist());
+
+        BirthdayDateDriver.getEditor().focusedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean t1) {
+                if(!t1) {
+                    LocalDate temp = LocalDate.parse(BirthdayDateDriver.getEditor().getText(), DateTimeFormatter.ofPattern("M/d/yyyy"));
+                    BirthdayDateDriver.setValue(temp);
+                }
+            }
+        });
+
+        EmploymentDateDriver.getEditor().focusedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean t1) {
+                if(!t1) {
+                    LocalDate temp = LocalDate.parse(EmploymentDateDriver.getEditor().getText(), DateTimeFormatter.ofPattern("M/d/yyyy"));
+                    EmploymentDateDriver.setValue(temp);
+                }
+            }
+        });
+
         driverTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Driver>() {
             @Override
-            public void changed(ObservableValue<? extends Driver> observableValue, Driver staraOsoba, Driver novaOsoba) {
-                if (staraOsoba != null) {
-                    odvezivanje();
+            public void changed(ObservableValue<? extends Driver> observableValue, Driver oldPerson, Driver newPerson) {
+                if (oldPerson != null) {
+                    setTextPropetryUnbind();
                 }
-                if (novaOsoba == null) {
+                if (newPerson == null) {
                     nameDriver.setText("");
                     surnameDriver.setText("");
                     JMBGDriver.setText("");
-                    BirthdayDateDriver.getEditor().setText("");
-                    EmploymentDateDriver.getEditor().setText("");
+                    BirthdayDateDriver.setValue(LocalDate.of(1900,1,1));
+                    EmploymentDateDriver.setValue(LocalDate.of(1900,1,1));
                 } else {
-                    Driver driver = (Driver) driverTable.getSelectionModel().getSelectedItem();
-                    odvezivanje();
-                    transportModel.setCurrentPersonDriver(driver);
-                    povezivanje();
-                    driverTable.refresh();
+                    updateSelectedDriver();
                 }
                 driverTable.refresh();
             }
@@ -105,22 +109,18 @@ public class Controller {
         driverTable.requestFocus();
         driverTable.getSelectionModel().selectFirst();
 
-        busTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Bus>() {
+        busTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
             @Override
-            public void changed(ObservableValue<? extends Bus> observableValue, Bus staraOsoba, Bus novaOsoba) {
-                if (staraOsoba != null) {
-                    odvezivanje();
+            public void changed(ObservableValue observableValue, Object oldBus, Object newBus) {
+                if (oldBus != null) {
+                    setTextPropetryUnbind();
                 }
-                if (novaOsoba == null) {
+                if (newBus == null) {
                     MakerBus.setText("");
                     SeriesBus.setText("");
                     SeatNumberBus.setText("");
                 } else {
-                    Bus bus = (Bus) busTable.getSelectionModel().getSelectedItem();
-                    odvezivanje();
-                    transportModel.setCurrentPersonBus(bus);
-                    povezivanje();
-                    busTable.refresh();
+                    updateSelectedBus();
                 }
                 busTable.refresh();
             }
@@ -129,39 +129,119 @@ public class Controller {
         busTable.getSelectionModel().selectFirst();
     }
 
-    public void addNewDriver(ActionEvent actionEvent) {
-        transportModel.addDriver();
-        odvezivanje();
-        transportModel.setCurrentPersonDriver(transportModel.getDriver().get(transportModel.getDriver().size()-1));
-        povezivanje();
+    @FXML
+    private void updateSelectedBus() {
+        if(transportModel.getCurrentBus() == null) {
+            System.out.println("NULL driver");
+        }
+        Bus b = (Bus) busTable.getSelectionModel().getSelectedItem();
+        setTextPropetryUnbind();
+        transportModel.setCurrentBus(b);
+        busTable.setItems(transportModel.getBUSlist());
+        busTable.refresh();
+        setTextPropetryBind();
+    }
+
+    @FXML
+    private void updateSelectedDriver() {
+        if(transportModel.getCurrentDriver() == null) {
+            System.out.println("NULL driver");
+        }
+        Driver d = (Driver) driverTable.getSelectionModel().getSelectedItem();
+        setTextPropetryUnbind();
+        transportModel.setCurrentDriver(d);
+        setTextPropetryBind();
+        driverTable.setItems(transportModel.getDRIVERlist());
         driverTable.refresh();
     }
 
-    public void deleteCurrentDriver(ActionEvent actionEvent) {
-        transportModel.getDriver().removeAll((Driver) driverTable.getSelectionModel().getSelectedItem());
-        driverTable.refresh();
+    private void updateTableView() {
+        int index = driverTable.getSelectionModel().getSelectedIndex();
+        driverTable.getItems().clear();
+        transportModel.ucitajVozace();
+        driverTable.setItems(transportModel.getDRIVERlist());
+        driverTable.requestFocus();
+        driverTable.getSelectionModel().select(index);
+
+        index = busTable.getSelectionModel().getSelectedIndex();
+        busTable.getItems().clear();
+        transportModel.ucitajBuseve();
+        busTable.setItems(transportModel.getBUSlist());
+        busTable.requestFocus();
+        busTable.getSelectionModel().select(index);
     }
 
-    public void exitDriverWindow(ActionEvent actionEvent) {
+    @FXML
+    private void addNewDriver(javafx.event.ActionEvent mouseEvent) {
+        transportModel.addDriver(new Driver());
+        updateTableView();
+        driverTable.getSelectionModel().selectLast();
+    }
+
+    @FXML
+    private void deleteDriver(ActionEvent mouseEvent) {
+        setTextPropetryUnbind();
+        int index = driverTable.getSelectionModel().getSelectedIndex();
+        if ( index != -1) {
+            transportModel.deleteCurrentDriver();
+            updateTableView();
+            if (index == driverTable.getItems().size()) {
+                driverTable.getSelectionModel().selectLast();
+            }
+        }
+    }
+
+    @FXML
+    private void deleteBus(ActionEvent actionEvent) {
+        setTextPropetryUnbind();
+        int index = busTable.getSelectionModel().getSelectedIndex();
+        if ( index != -1) {
+            transportModel.deleteBus(transportModel.getCurrentBus());
+            updateTableView();
+            if (index == busTable.getItems().size()) {
+                busTable.getSelectionModel().selectLast();
+            }
+        }
+    }
+
+    @FXML
+    private void addNewBus(ActionEvent actionEvent) {
+        transportModel.addBus(new Bus());
+        updateTableView();
+        busTable.getSelectionModel().selectLast();
+    }
+
+    private void setTextPropetryBind() {
+        nameDriver.textProperty().bindBidirectional(new SimpleStringProperty(transportModel.getCurrentDriver().getName()));
+        surnameDriver.textProperty().bindBidirectional(new SimpleStringProperty(transportModel.getCurrentDriver().getSurname()));
+        JMBGDriver.textProperty().bindBidirectional(new SimpleStringProperty(transportModel.getCurrentDriver().getJMBG()));
+        BirthdayDateDriver.valueProperty().bindBidirectional(transportModel.getCurrentDriver().birthdayDateProperty());
+        EmploymentDateDriver.valueProperty().bindBidirectional(transportModel.getCurrentDriver().employmentDateProperty());
+
+        MakerBus.textProperty().bindBidirectional(new SimpleStringProperty(transportModel.getCurrentBus().getMaker()));
+        SeriesBus.textProperty().bindBidirectional(new SimpleStringProperty(transportModel.getCurrentBus().getSeries()));
+        SeatNumberBus.textProperty().bindBidirectional(new SimpleIntegerProperty(transportModel.getCurrentBus().getSeatNumber()), new NumberStringConverter());
+    }
+
+    private void setTextPropetryUnbind() {
+        nameDriver.textProperty().unbindBidirectional(transportModel.getCurrentDriver().getName());
+        surnameDriver.textProperty().unbindBidirectional(transportModel.getCurrentDriver().getSurname());
+        JMBGDriver.textProperty().unbindBidirectional(transportModel.getCurrentDriver().getJMBG());
+        BirthdayDateDriver.valueProperty().unbindBidirectional(transportModel.getCurrentDriver().birthdayDateProperty());
+        EmploymentDateDriver.valueProperty().unbindBidirectional(transportModel.getCurrentDriver().employmentDateProperty());
+
+        MakerBus.textProperty().unbindBidirectional(transportModel.getCurrentBus().getMaker());
+        SeriesBus.textProperty().unbindBidirectional(transportModel.getCurrentBus().getSeries());
+        SeatNumberBus.textProperty().unbindBidirectional(transportModel.getCurrentBus().getSeatNumber());
+    }
+
+    public void exitDriver(ActionEvent actionEvent) {
         Node n = (Node) actionEvent.getSource();
         Stage stage = (Stage) n.getScene().getWindow();
         stage.close();
     }
 
-    public void addNewBus(ActionEvent actionEvent) {
-        transportModel.addBus();
-        odvezivanje();
-        transportModel.setCurrentPersonBus(transportModel.getBus().get(transportModel.getBus().size()-1));
-        povezivanje();
-        busTable.refresh();
-    }
-
-    public void deleteCurrentBus(ActionEvent actionEvent) {
-        transportModel.getBus().removeAll((Bus) busTable.getSelectionModel().getSelectedItem());
-        busTable.refresh();
-        }
-
-    public void exitBusWindow(ActionEvent actionEvent) {
+    public void exitBus(ActionEvent actionEvent) {
         Node n = (Node) actionEvent.getSource();
         Stage stage = (Stage) n.getScene().getWindow();
         stage.close();

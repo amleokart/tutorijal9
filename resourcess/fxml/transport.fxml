@@ -19,7 +19,7 @@
       <content>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                <children>
-                  <TableView  fx:id="driverTable" layoutX="14.0" layoutY="14.0" prefHeight="149.0" prefWidth="571.0">
+                  <TableView fx:id="driverTable" layoutX="14.0" layoutY="14.0" prefHeight="149.0" prefWidth="571.0">
                     <columns>
                       <TableColumn fx:id="columnName" prefWidth="120.0" text="Name" />
                       <TableColumn fx:id="columnSurname" minWidth="0.0" prefWidth="133.0" text="Surname" />
@@ -74,9 +74,9 @@
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Button fx:id="adddriverButton" mnemonicParsing="false" onAction="#addNewDriver" text="Add driver" GridPane.columnIndex="1" />
-                        <Button fx:id="deletedriverButton" mnemonicParsing="false" onAction="#deleteCurrentDriver" text="Delete driver" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <Button fx:id="exitdriverButton" mnemonicParsing="false" onAction="#exitDriverWindow" text="Exit" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <Button mnemonicParsing="false" onAction="#addNewDriver" text="Add driver" GridPane.columnIndex="1" />
+                        <Button mnemonicParsing="false" onAction="#deleteDriver" text="Delete driver" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <Button mnemonicParsing="false" onAction="#exitDriver" text="Exit" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                      </children>
                   </GridPane>
                </children></AnchorPane>
@@ -99,9 +99,9 @@
                   <TextField fx:id="MakerBus" layoutX="107.0" layoutY="40.0" />
                   <TextField fx:id="SeriesBus" layoutX="107.0" layoutY="75.0" />
                   <TextField fx:id="SeatNumberBus" layoutX="107.0" layoutY="110.0" />
-                  <Button fx:id="addbusButton" layoutX="22.0" layoutY="186.0" mnemonicParsing="false" onAction="#addNewBus" text="Add bus" />
-                  <Button fx:id="deletebusButton" layoutX="93.0" layoutY="186.0" mnemonicParsing="false" onAction="#deleteCurrentBus" text="Delete bus" />
-                  <Button fx:id="exitbusButton" layoutX="182.0" layoutY="186.0" mnemonicParsing="false" onAction="#exitBusWindow" text="Exit" />
+                  <Button layoutX="22.0" layoutY="186.0" mnemonicParsing="false" onAction="#addNewBus" text="Add bus" />
+                  <Button layoutX="93.0" layoutY="186.0" mnemonicParsing="false" onAction="#deleteBus" text="Delete bus" />
+                  <Button fx:id="exitbusButton" layoutX="182.0" layoutY="186.0" mnemonicParsing="false" onAction="#exitBus" text="Exit" />
                </children></AnchorPane>
       </content>
     </Tab>
